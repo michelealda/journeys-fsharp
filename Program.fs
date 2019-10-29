@@ -1,4 +1,5 @@
-﻿open System.IO
+﻿open System
+open System.IO
 
 type Direction = | North | East | South | West
 type Move = | Forward | Left | Right
@@ -34,15 +35,18 @@ let parseDirection d =
     | 'W' -> Some West
     | _ -> None
 
+let tryInt (s: string) =
+    match Int32.TryParse(s) with
+    | (true,int) -> Some int
+    | _ -> None
+    
 let parsePosition (x: string) =
     let xs = x.ToCharArray()
-    try
-       {
-           x= xs.[0] |> string |> int;
-           y= xs.[2] |> string |> int;
-           direction= xs.[4] |> parseDirection |> Option.get 
-       } |> Some
-    with _ -> None
+    Option.map3
+        (fun x y direction -> {x=x;y=y;direction=direction})
+        (xs.[0] |> string |> tryInt)
+        (xs.[2] |> string |> tryInt)
+        (xs.[4] |> parseDirection)
 
 let parseJourney xs = 
     match xs with

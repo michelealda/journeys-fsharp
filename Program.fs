@@ -1,9 +1,14 @@
 ﻿open System.IO
 
 type Direction = | North | East | South | West
-type Position = (int * int * Direction)
 type Move = | Forward | Left | Right
-    
+
+type Position = {
+     x: int
+     y: int
+     direction: Direction
+ }
+
 type Journey = { 
     startP: Position
     endP : Position
@@ -32,11 +37,11 @@ let parseDirection d =
 let parsePosition (x: string) =
     let xs = x.ToCharArray()
     try
-       (
-            xs.[0] |> string |> int,
-            xs.[2] |> string |> int,
-            xs.[4] |> parseDirection |> Option.get 
-        ) |> Position |> Some
+       {
+           x= xs.[0] |> string |> int;
+           y= xs.[2] |> string |> int;
+           direction= xs.[4] |> parseDirection |> Option.get 
+       } |> Some
     with _ -> None
 
 let parseJourney xs = 
@@ -49,12 +54,12 @@ let parseJourney xs =
             (parseMoves m)
     | _ -> None
 
-let move (x, y, d) =
-    match d with
-    | North -> (x, y+1, d)
-    | East  -> (x+1,y,d)
-    | South -> (x,y-1,d)
-    | West  -> (x-1,y,d)
+let move (p:Position) =
+    match p.direction with
+    | North -> {p with y= p.y+1}
+    | East  -> {p with x= p.x+1}
+    | South -> {p with y= p.y-1}
+    | West  -> {p with x= p.x-1}
 
 let toTheRight d = 
     match d with
@@ -70,7 +75,7 @@ let toTheLeft d =
     | South -> East
     | West  -> South
 
-let rotate rotateFn (x, y, d) = (x, y, (rotateFn d))
+let rotate rotateFn (p:Position) = {p with direction = (rotateFn p.direction)}
 
 let executeMove p m =
     p |> match m with

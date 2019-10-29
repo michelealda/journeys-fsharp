@@ -56,27 +56,27 @@ let move (x, y, d) =
     | South -> (x,y-1,d)
     | West  -> (x-1,y,d)
 
-let rotateR (x, y, d) =
+let toTheRight d = 
     match d with
     | North -> East
     | East  -> South
     | South -> West
     | West  -> North
-    |> fun newDirection -> (x,y,newDirection)
 
-let rotateL (x, y, d) =
+let toTheLeft d = 
     match d with
     | North -> West
     | East  -> North
     | South -> East
     | West  -> South
-    |> fun newDirection -> (x,y,newDirection)
+
+let rotate rotateFn (x, y, d) = (x, y, (rotateFn d))
 
 let executeMove p m =
-    match m with
-    | Forward -> move p
-    | Right -> rotateR p
-    | Left -> rotateL p
+    p |> match m with
+         | Forward -> move 
+         | Right -> rotate toTheRight 
+         | Left -> rotate toTheLeft 
 
 let isJourneyValid j =
     match j with
